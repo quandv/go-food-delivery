@@ -1,9 +1,9 @@
 package common
 
 type Pagination struct {
-	Page  int
-	Limit int
-	Total int
+	Page  int   `json:"page" form:"page"`
+	Limit int   `json:"limit" form:"limit"`
+	Total int64 `json:"total"`
 }
 
 func (p *Pagination) FullFill() {

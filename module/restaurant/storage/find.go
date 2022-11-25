@@ -2,6 +2,7 @@ package restaurantstorage
 
 import (
 	"context"
+	common "food-delivery/common"
 	restaurantmodel "food-delivery/module/restaurant/model"
 	"log"
 )
@@ -31,23 +32,26 @@ func (s *sqlStore) FindOne(
 
 func (s *sqlStore) Find(
 	ctx context.Context,
-	condition map[string]interface{},
-	// pagination map[string]interface{},
-	// moreKeys ...string,
-) (*[]restaurantmodel.Restaurant, error) {
-	db := s.db.Table(restaurantmodel.Restaurant{}.TableName()).Where(condition)
+	filter restaurantmodel.Filter,
+	paging *common.Pagination,
+	moreKeys ...string,
+) ([]restaurantmodel.Restaurant, error) { // không cần con trỏ cho "[]restaurantmodel.Restaurant" bởi vì nó là slice, mà slice bản chất là con trỏ rồi nên nó có thể nhận giá trị "nil"
+	db := s.db.Table(restaurantmodel.Restaurant{}.TableName())
 
-	// page := pagination["page"]
-	// limit := pagination["limit"]
+	if f := filter; f.Name != "" {
+		db.Where("name = ?", f.Name)
+	}
 
-	// log.Println(page)
-	// log.Println(limit)
-	// offset := (page - 1) * limit
+	if err := db.Count(&paging.Total).Error; err != nil {
+		return nil, err
+	}
+
+	offset := (paging.Page - 1) * paging.Limit
 	var data []restaurantmodel.Restaurant
 
-	if err := db.Find(&data); err.Error != nil {
+	if err := db.Offset(offset).Limit(paging.Limit).Find(&data); err.Error != nil {
 		return nil, err.Error
 	}
 
-	return &data, nil
+	return data, nil
 }

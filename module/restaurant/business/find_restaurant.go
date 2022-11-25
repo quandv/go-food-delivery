@@ -1,6 +1,7 @@
 package restaurantbusiness
 
 import (
+	common "food-delivery/common"
 	restaurantmodel "food-delivery/module/restaurant/model"
 
 	"golang.org/x/net/context"
@@ -14,9 +15,10 @@ type FindRestaurantStore interface {
 	) (*restaurantmodel.Restaurant, error)
 	Find(
 		context context.Context,
-		condition map[string]interface{},
+		filter restaurantmodel.Filter,
+		paging *common.Pagination,
 		moreKeys ...string,
-	) (*[]restaurantmodel.Restaurant, error)
+	) ([]restaurantmodel.Restaurant, error)
 }
 
 type findRestaurantBusiness struct {
@@ -41,11 +43,11 @@ func (business *findRestaurantBusiness) FindOne(
 
 func (business *findRestaurantBusiness) Find(
 	context context.Context,
-	condition map[string]interface{},
-	pagination map[string]interface{},
-	// moreKeys ...string,
-) (*[]restaurantmodel.Restaurant, error) {
-	data, err := business.store.Find(context, condition)
+	filter restaurantmodel.Filter,
+	paging *common.Pagination,
+	moreKeys ...string,
+) ([]restaurantmodel.Restaurant, error) {
+	data, err := business.store.Find(context, filter, paging)
 	if err != nil {
 		return nil, err
 	}

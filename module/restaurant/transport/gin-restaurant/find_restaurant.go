@@ -1,7 +1,9 @@
 package ginrestaurant
 
 import (
+	common "food-delivery/common"
 	restaurantbusiness "food-delivery/module/restaurant/business"
+	restaurantmodel "food-delivery/module/restaurant/model"
 	restaurantstorage "food-delivery/module/restaurant/storage"
 	"net/http"
 	"strconv"
@@ -40,31 +42,27 @@ func FindRestaurantById(db *gorm.DB) gin.HandlerFunc {
 
 func FindRestaurant(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		page, err := strconv.Atoi(ctx.Param("page"))
+		var paging common.Pagination
 
-		if err != nil {
+		if err := ctx.ShouldBind(&paging); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "page must be an integer",
+				"error": err.Error(),
 			})
 			return
 		}
 
-		limit, err := strconv.Atoi(ctx.Param("limit"))
+		var filter restaurantmodel.Filter
 
-		if err != nil {
+		if err := ctx.ShouldBind(&filter); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "limit must be an integer",
+				"error": err.Error(),
 			})
-			return
 		}
 
 		store := restaurantstorage.NewSQLStore(db)
 		business := restaurantbusiness.NewFindRestaurantBusiness(store)
 
-		result, err := business.Find(ctx, map[string]interface{}, map[string]interface{}{
-			"page":  page,
-			"limit": limit,
-		})
+		result, err := business.Find(ctx, filter, &paging)
 
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,8 +71,6 @@ func FindRestaurant(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": &result,
-		})
+		ctx.JSON(http.StatusOK, common.NewResponse(result, paging, filter))
 	}
 }
