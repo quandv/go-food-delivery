@@ -1,8 +1,8 @@
 package restaurantbusiness
 
 import (
-	common "food-delivery/common"
-	restaurantmodel "food-delivery/module/restaurant/model"
+	common "go-food-delivery/common"
+	restaurantmodel "go-food-delivery/module/restaurant/model"
 
 	"golang.org/x/net/context"
 )

@@ -1,8 +1,9 @@
 package main
 
 import (
-	appctx "food-delivery/component/app-context"
-	"food-delivery/module/restaurant/transport/gin-restaurant"
+	appctx "go-food-delivery/component/app-context"
+	middleware "go-food-delivery/middleware"
+	"go-food-delivery/module/restaurant/transport/gin-restaurant"
 	"log"
 	"os"
 
@@ -10,25 +11,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-
-type Restaurant struct {
-	Id      int    `json:"id" gorm:"column:id;"`
-	Name    string `json:"name" gorm:"column:name;"`
-	Address string `json:"address" gorm:"column:address;"`
-}
-
-func (Restaurant) TableName() string {
-	return "restaurants"
-}
-
-type RestaurantUpdate struct {
-	Name    *string `json:"name" gorm:"column:name;"`
-	Address *string `json:"address" gorm:"column:address;"`
-}
-
-func (RestaurantUpdate) TableName() string {
-	return Restaurant{}.TableName()
-}
 
 func main() {
 	dsn := os.Getenv("FOOD_DELIVERY_DB_CONNECT_STRING")
@@ -105,9 +87,9 @@ func main() {
 	// }
 
 	// Create web server by Gin framework
-	r := gin.Default()
-
-	restaurant := r.Group("/restaurants")
+	app := gin.Default()
+	app.Use(middleware.Recover(appCtx))
+	restaurant := app.Group("/restaurants")
 
 	restaurant.POST("", ginrestaurant.CreateRestaurant(appCtx))
 
@@ -116,5 +98,5 @@ func main() {
 	restaurant.GET("/", ginrestaurant.FindRestaurant(db))
 	restaurant.DELETE("/:id", ginrestaurant.DeleteRestaurantById(db))
 
-	r.Run(":8888") // listen and serve on 0.0.0.0:8888
+	app.Run(":8888") // listen and serve on 0.0.0.0:8888
 }

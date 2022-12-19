@@ -2,7 +2,7 @@ package restaurantbusiness
 
 import (
 	"context"
-	restaurantmodel "food-delivery/module/restaurant/model"
+	restaurantmodel "go-food-delivery/module/restaurant/model"
 	"log"
 )
 

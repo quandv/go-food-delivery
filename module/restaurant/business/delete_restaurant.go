@@ -3,7 +3,7 @@ package restaurantbusiness
 import (
 	"context"
 	"errors"
-	restaurantmodel "food-delivery/module/restaurant/model"
+	restaurantmodel "go-food-delivery/module/restaurant/model"
 )
 
 type DeleteRestaurantStore interface {
