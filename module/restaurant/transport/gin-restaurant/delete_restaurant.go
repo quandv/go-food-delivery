@@ -1,8 +1,9 @@
 package ginrestaurant
 
 import (
-	restaurantbusiness "food-delivery/module/restaurant/business"
-	restaurantstorage "food-delivery/module/restaurant/storage"
+	common "go-food-delivery/common"
+	restaurantbusiness "go-food-delivery/module/restaurant/business"
+	restaurantstorage "go-food-delivery/module/restaurant/storage"
 	"net/http"
 	"strconv"
 
@@ -15,9 +16,7 @@ func DeleteRestaurantById(db *gorm.DB) gin.HandlerFunc {
 		id, err := strconv.Atoi(ctx.Param("id"))
 
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "id must be an integer",
-			})
+			ctx.JSON(http.StatusBadRequest, common.InvalidRequest(err, "id must be an integer"))
 			return
 		}
 
@@ -26,7 +25,7 @@ func DeleteRestaurantById(db *gorm.DB) gin.HandlerFunc {
 
 		if err := business.DeleteOne(ctx, map[string]interface{}{"id": id}); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
+				"error": err.Error(),
 			})
 			return
 		}

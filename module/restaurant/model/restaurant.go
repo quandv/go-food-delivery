@@ -6,6 +6,8 @@ type Restaurant struct {
 	Address string `json:"address" gorm:"column:address;"`
 }
 
+const EntityName = "Restaurant"
+
 func (Restaurant) TableName() string {
 	return "restaurants"
 }

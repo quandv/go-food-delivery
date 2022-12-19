@@ -2,8 +2,8 @@ package restaurantstorage
 
 import (
 	"context"
-	common "food-delivery/common"
-	restaurantmodel "food-delivery/module/restaurant/model"
+	common "go-food-delivery/common"
+	restaurantmodel "go-food-delivery/module/restaurant/model"
 	"log"
 )
 
@@ -20,10 +20,16 @@ func (s *sqlStore) FindOne(
 	var data restaurantmodel.Restaurant
 	id := condition["id"]
 
-	if err := s.db.Where("id = ?", id).First(&data); err.Error != nil {
-		log.Println("err in store: ", err)
-		return nil, err.Error
+	/* Has 2 ways to handle "Gorm Error".
+	* Refer doc: https://gorm.io/docs/error_handling.html
+	 */
+	if err := s.db.Where("id = ?", id).First(&data).Error; err != nil {
+		return nil, common.ErrDB(restaurantmodel.EntityName, err)
 	}
+
+	// if result := s.db.Where("id = ?", id).First(&data); result.Error != nil {
+	// 	return nil, common.ErrDB(restaurantmodel.EntityName, result.Error)
+	// }
 
 	log.Println("data in store: ", data)
 
@@ -43,14 +49,14 @@ func (s *sqlStore) Find(
 	}
 
 	if err := db.Count(&paging.Total).Error; err != nil {
-		return nil, err
+		return nil, common.ErrDB(restaurantmodel.EntityName, err)
 	}
 
 	offset := (paging.Page - 1) * paging.Limit
 	var data []restaurantmodel.Restaurant
 
-	if err := db.Offset(offset).Limit(paging.Limit).Find(&data); err.Error != nil {
-		return nil, err.Error
+	if err := db.Offset(offset).Limit(paging.Limit).Find(&data).Error; err != nil {
+		return nil, common.ErrDB(restaurantmodel.EntityName, err)
 	}
 
 	return data, nil

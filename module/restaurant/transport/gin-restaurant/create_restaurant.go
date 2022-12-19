@@ -1,10 +1,10 @@
 package ginrestaurant
 
 import (
-	appctx "food-delivery/component/app-context"
-	restaurantbusiness "food-delivery/module/restaurant/business"
-	restaurantmodel "food-delivery/module/restaurant/model"
-	restaurantstorage "food-delivery/module/restaurant/storage"
+	appctx "go-food-delivery/component/app-context"
+	restaurantbusiness "go-food-delivery/module/restaurant/business"
+	restaurantmodel "go-food-delivery/module/restaurant/model"
+	restaurantstorage "go-food-delivery/module/restaurant/storage"
 	"log"
 	"net/http"
 
